@@ -173,7 +173,7 @@ class PedidoController {
                         elseif($estado == 'cancelled') $estado_texto = "CANCELADO";
 
                         $to = $user_data->email;
-                        $subject = "Actualización de tu pedido #$id - Tu Tienda";
+                        $subject = "Actualización de tu pedido #$id - Calsado Shop";
                         
                         $message = "Hola " . $user_data->nombre . ",\n\n";
                         $message .= "Te informamos que el estado de tu pedido #" . $id . " ha sido actualizado.\n\n";
@@ -181,8 +181,9 @@ class PedidoController {
                         $message .= "Puedes revisar los detalles entrando a tu cuenta en nuestra tienda.\n\n";
                         $message .= "Gracias por tu compra.";
 
-                        $headers = "From: notificaciones@tutienda.com" . "\r\n" .
-                                   "Reply-To: contacto@tutienda.com" . "\r\n" .
+                        // ACTUALIZADO PARA ENVIAR COMO CALSADO.SHOP
+                        $headers = "From: notificaciones@calsado.shop" . "\r\n" .
+                                   "Reply-To: contacto@calsado.shop" . "\r\n" .
                                    "X-Mailer: PHP/" . phpversion();
 
                         @mail($to, $subject, $message, $headers); 

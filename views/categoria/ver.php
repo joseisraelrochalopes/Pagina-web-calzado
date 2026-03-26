@@ -42,6 +42,23 @@
     }
 </style>
 
+<?php 
+    // 🔥 MAGIA: OBTENER LOS FAVORITOS DEL USUARIO ACTUAL 🔥
+    $mis_favoritos_ids = array();
+    if(isset($_SESSION['identity'])){
+        require_once 'models/Favorito.php';
+        $fav_model_view = new Favorito();
+        $fav_model_view->setUsuario_id($_SESSION['identity']->id);
+        $mis_favs_view = $fav_model_view->getAllByUser();
+        if($mis_favs_view){
+            while($fav_item = $mis_favs_view->fetch_object()){
+                $id_prod = isset($fav_item->producto_id) ? $fav_item->producto_id : $fav_item->id;
+                $mis_favoritos_ids[] = $id_prod; 
+            }
+        }
+    }
+?>
+
 <?php if(isset($categoria) && is_object($categoria)): ?>
     <div class="text-center mb-5">
         <h1 class="titulo-categoria">
@@ -62,6 +79,10 @@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
                     <div class="card h-100 shadow-sm card-efecto <?=$pro->stock == 0 ? 'opacity-75' : ''?>">
                         
+                        <?php if($pro->oferta == 'SI'): ?>
+                            <span class="position-absolute top-0 start-0 badge bg-danger m-3 px-2 py-1 shadow" style="z-index: 2;">OFERTA</span>
+                        <?php endif; ?>
+
                         <div class="img-wrapper text-center">
                             <a href="<?=base_url?>producto/ver?id=<?=$pro->id?>">
                                 <?php if($pro->imagen != null): ?>
@@ -74,24 +95,37 @@
                         
                         <div class="card-body d-flex flex-column text-center">
                             <h5 class="card-title mb-1 fw-bold" style="font-size: 1rem; color: #0a192f;">
-                                <?=$pro->nombre?>
+                                <a href="<?=base_url?>producto/ver?id=<?=$pro->id?>" class="text-decoration-none" style="color: #0a192f;">
+                                    <?=$pro->nombre?>
+                                </a>
                             </h5>
                             
                             <p class="card-text fw-bold fs-5 mt-2 mb-3" style="color: #b89324;">
                                 <?=Utils::formatPrice($pro->precio)?>
                             </p>
                             
-                            <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mt-auto gap-2">
                                 <?php if($pro->stock > 0): ?>
-                                    <a href="<?=base_url?>producto/ver?id=<?=$pro->id?>" class="btn btn-dark w-100 rounded-pill shadow-sm py-2" style="background-color: #0a192f; border: none; font-size: 0.9rem;">
-                                        <i class="bi bi-cart-plus"></i> VER OPCIONES
+                                    <a href="<?=base_url?>producto/ver?id=<?=$pro->id?>" class="btn btn-dark flex-grow-1 rounded-pill shadow-sm" style="font-size: 0.9rem; background-color: #0a192f;">
+                                        <i class="bi bi-eye"></i> Ver Tallas
                                     </a>
                                 <?php else: ?>
-                                    <button class="btn btn-danger w-100 rounded-pill shadow-sm py-2" style="font-size: 0.9rem;" disabled>
-                                        <i class="bi bi-x-circle"></i> AGOTADO
-                                    </button>
+                                    <button class="btn btn-danger flex-grow-1 rounded-pill shadow-sm" style="font-size: 0.9rem;" disabled>AGOTADO</button>
                                 <?php endif; ?>
+
+                                <?php 
+                                    // 🔥 REVISAR SI EL PRODUCTO YA ES FAVORITO 🔥
+                                    $es_favorito = in_array($pro->id, $mis_favoritos_ids);
+                                ?>
+
+                                <a href="<?=base_url?>favorito/<?= $es_favorito ? 'eliminar' : 'add' ?>?id=<?=$pro->id?>" 
+                                   class="btn <?= $es_favorito ? 'btn-danger' : 'btn-outline-danger' ?> rounded-circle shadow-sm d-flex align-items-center justify-content-center" 
+                                   style="width: 38px; height: 38px; min-width: 38px;" 
+                                   title="<?= $es_favorito ? 'Quitar de favoritos' : 'Añadir a favoritos' ?>">
+                                    <i class="bi <?= $es_favorito ? 'bi-heart-fill' : 'bi-heart' ?>"></i>
+                                </a>
                             </div>
+
                         </div>
                     </div>
                 </div>

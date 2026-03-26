@@ -31,9 +31,7 @@
     .paginacion-scroll::-webkit-scrollbar { height: 4px; }
     .paginacion-scroll::-webkit-scrollbar-thumb { background: #eee; border-radius: 10px; }
 
-    .pagination .page-item {
-        margin: 0 3px;
-    }
+    .pagination .page-item { margin: 0 3px; }
 
     .pagination .page-link {
         border-radius: 8px !important;
@@ -51,6 +49,23 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
 </style>
+
+<?php 
+    // 🔥 MAGIA: OBTENER LOS FAVORITOS DEL USUARIO ACTUAL PARA PINTAR LOS CORAZONES 🔥
+    $mis_favoritos_ids = array();
+    if(isset($_SESSION['identity'])){
+        require_once 'models/Favorito.php';
+        $fav_model_view = new Favorito();
+        $fav_model_view->setUsuario_id($_SESSION['identity']->id);
+        $mis_favs_view = $fav_model_view->getAllByUser();
+        if($mis_favs_view){
+            while($fav_item = $mis_favs_view->fetch_object()){
+                $id_prod = isset($fav_item->producto_id) ? $fav_item->producto_id : $fav_item->id;
+                $mis_favoritos_ids[] = $id_prod; 
+            }
+        }
+    }
+?>
 
 <?php if(isset($ofertas) && $ofertas->num_rows > 0 && !isset($_GET['page']) && !isset($_GET['sort'])): ?>
     <div id="carouselOfertas" class="carousel slide mb-5 shadow-lg rounded overflow-hidden" data-bs-ride="carousel" style="border-radius: 20px;">
@@ -123,6 +138,11 @@
                 <button type="submit" class="btn btn-dark w-100 shadow-sm" style="height: 38px;"><i class="bi bi-funnel"></i> Filtrar</button>
             </div>
         </form>
+        <?php if(isset($_GET['min_price']) || isset($_GET['sort'])): ?>
+            <div class="mt-3 text-end">
+                <a href="<?=base_url?>" class="text-danger text-decoration-none small fw-bold"><i class="bi bi-x-circle"></i> Limpiar todos los filtros</a>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -136,17 +156,44 @@
         <?php while($pro = $productos->fetch_object()): ?>
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
                 <div class="card h-100 shadow-sm card-efecto <?=$pro->stock == 0 ? 'opacity-75' : ''?>">
+                    
+                    <?php if($pro->oferta == 'SI'): ?>
+                        <span class="position-absolute top-0 start-0 badge bg-danger m-3 px-2 py-1 shadow">OFERTA</span>
+                    <?php endif; ?>
+
                     <div class="img-wrapper">
                         <a href="<?=base_url?>producto/ver?id=<?=$pro->id?>">
                             <img src="<?=Utils::showImage($pro->imagen)?>" class="card-img-top p-4 img-efecto" alt="<?=$pro->nombre?>" style="height: 220px; object-fit: contain; background-color: #f8f9fa;">
                         </a>
                     </div>
                     <div class="card-body d-flex flex-column text-center">
-                        <h5 class="card-title mb-1 fw-bold"><?=$pro->nombre?></h5>
+                        <h5 class="card-title mb-1 fw-bold">
+                            <a href="<?=base_url?>producto/ver?id=<?=$pro->id?>" class="text-decoration-none text-dark"><?=$pro->nombre?></a>
+                        </h5>
                         <p class="card-text text-success fw-bold fs-5 mt-2 mb-3"><?=Utils::formatPrice($pro->precio)?></p>
-                        <div class="mt-auto">
-                            <a href="<?=base_url?>producto/ver?id=<?=$pro->id?>" class="btn btn-dark w-100 rounded-pill shadow-sm">Ver Detalles</a>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-auto gap-2">
+                            <?php if($pro->stock > 0): ?>
+                                <a href="<?=base_url?>producto/ver?id=<?=$pro->id?>" class="btn btn-dark flex-grow-1 rounded-pill shadow-sm" style="font-size: 0.9rem;">
+                                    <i class="bi bi-eye"></i> Ver Tallas
+                                </a>
+                            <?php else: ?>
+                                <button class="btn btn-danger flex-grow-1 rounded-pill shadow-sm" style="font-size: 0.9rem;" disabled>AGOTADO</button>
+                            <?php endif; ?>
+
+                            <?php 
+                                // 🔥 REVISAR SI EL PRODUCTO YA ES FAVORITO 🔥
+                                $es_favorito = in_array($pro->id, $mis_favoritos_ids);
+                            ?>
+
+                            <a href="<?=base_url?>favorito/<?= $es_favorito ? 'eliminar' : 'add' ?>?id=<?=$pro->id?>" 
+                               class="btn <?= $es_favorito ? 'btn-danger' : 'btn-outline-danger' ?> rounded-circle shadow-sm d-flex align-items-center justify-content-center" 
+                               style="width: 38px; height: 38px; min-width: 38px;" 
+                               title="<?= $es_favorito ? 'Quitar de favoritos' : 'Añadir a favoritos' ?>">
+                                <i class="bi <?= $es_favorito ? 'bi-heart-fill' : 'bi-heart' ?>"></i>
+                            </a>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -159,39 +206,31 @@
     if(isset($_GET['min_price'])) $url_params .= "&min_price=".$_GET['min_price'];
     if(isset($_GET['max_price'])) $url_params .= "&max_price=".$_GET['max_price'];
     if(isset($_GET['sort'])) $url_params .= "&sort=".$_GET['sort'];
-
-    // LÓGICA DE RANGO INTELIGENTE PARA QUE NO SE VEA FEO
-    $range = 2; // Mostrará 2 números antes y 2 después de la página actual
+    $range = 2; 
 ?>
 
 <?php if(isset($total_pages) && $total_pages > 1): ?>
     <nav aria-label="Navegación" class="mt-5 mb-4 paginacion-scroll text-center">
         <ul class="pagination justify-content-center flex-nowrap d-inline-flex" style="margin-bottom: 0;">
-            
             <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
                 <a class="page-link shadow-sm" href="<?=base_url?>producto/index?page=<?=($page-1)?><?=$url_params?>">«</a>
             </li>
-
             <?php if($page > ($range + 1)): ?>
                 <li class="page-item"><a class="page-link shadow-sm" href="<?=base_url?>producto/index?page=1<?=$url_params?>">1</a></li>
                 <?php if($page > ($range + 2)): ?><li class="page-item disabled"><span class="page-link">...</span></li><?php endif; ?>
             <?php endif; ?>
-
             <?php for($i = max(1, $page - $range); $i <= min($total_pages, $page + $range); $i++): ?>
                 <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
                     <a class="page-link shadow-sm" href="<?=base_url?>producto/index?page=<?=$i?><?=$url_params?>"><?= $i ?></a>
                 </li>
             <?php endfor; ?>
-
             <?php if($page < ($total_pages - $range)): ?>
                 <?php if($page < ($total_pages - $range - 1)): ?><li class="page-item disabled"><span class="page-link">...</span></li><?php endif; ?>
                 <li class="page-item"><a class="page-link shadow-sm" href="<?=base_url?>producto/index?page=<?=$total_pages?><?=$url_params?>"><?=$total_pages?></a></li>
             <?php endif; ?>
-
             <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
                 <a class="page-link shadow-sm" href="<?=base_url?>producto/index?page=<?=($page+1)?><?=$url_params?>">»</a>
             </li>
-            
         </ul>
     </nav>
 <?php endif; ?>

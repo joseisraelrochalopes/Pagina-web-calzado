@@ -38,6 +38,19 @@ class Usuario {
 
     // --- MÉTODOS DE BASE DE DATOS (PROTEGIDOS CON PREPARED STATEMENTS) ---
 
+    // NUEVO MÉTODO PARA VALIDAR EMAIL DUPLICADO
+    public function findByEmail($email) {
+        $stmt = $this->db->prepare("SELECT * FROM usuarios WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stmt->close();
+        if($result && $result->num_rows == 1) {
+            return $result->fetch_object();
+        }
+        return false;
+    }
+
     public function save(){
         // Usamos Prepared Statements para insertar
         $sql = "INSERT INTO usuarios (nombre, apellidos, email, password, rol) VALUES(?, ?, ?, ?, 'user')";
@@ -136,6 +149,13 @@ class Usuario {
     public function getAll(){
         $sql = "SELECT * FROM usuarios ORDER BY id DESC";
         return $this->db->query($sql);
+    }
+
+    // NUEVO MÉTODO PARA OBTENER UN SOLO USUARIO (Lo usas en verFavoritosAdmin)
+    public function getOne() {
+        $sql = "SELECT * FROM usuarios WHERE id = {$this->id}";
+        $usuario = $this->db->query($sql);
+        return $usuario->fetch_object();
     }
 
     public function updateRol(){

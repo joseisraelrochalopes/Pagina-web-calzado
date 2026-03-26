@@ -20,19 +20,25 @@ class UsuarioController {
             
             if($nombre && $apellidos && $email && $password){
                 $usuario = new Usuario();
-                $usuario->setNombre($nombre);
-                $usuario->setApellidos($apellidos);
-                $usuario->setEmail($email);
                 
-                $password_segura = password_hash($password, PASSWORD_BCRYPT, ['cost'=>4]);
-                $usuario->setPassword($password_segura);
-
-                $save = $usuario->save();
-                
-                if($save){
-                    $_SESSION['register'] = "complete";
-                }else{
+                // VALIDAMOS SI EL EMAIL EXISTE ANTES DE INSERTARLO
+                if($usuario->findByEmail($email)){
                     $_SESSION['register'] = "failed";
+                } else {
+                    $usuario->setNombre($nombre);
+                    $usuario->setApellidos($apellidos);
+                    $usuario->setEmail($email);
+                    
+                    $password_segura = password_hash($password, PASSWORD_BCRYPT, ['cost'=>4]);
+                    $usuario->setPassword($password_segura);
+
+                    $save = $usuario->save();
+                    
+                    if($save){
+                        $_SESSION['register'] = "complete";
+                    }else{
+                        $_SESSION['register'] = "failed";
+                    }
                 }
             }else{
                 $_SESSION['register'] = "failed";
@@ -75,6 +81,12 @@ class UsuarioController {
         if(isset($_SESSION['admin'])){
             unset($_SESSION['admin']);
         }
+        
+        // LIMPIAR EL CARRITO PARA QUE NO SE VEAN PRODUCTOS AL SALIR
+        if(isset($_SESSION['carrito'])){
+            unset($_SESSION['carrito']);
+        }
+        
         header("Location:".base_url);
     }
 

@@ -2,7 +2,7 @@
 class Categoria {
     public $id;
     public $nombre;
-    public $imagen; // NUEVA PROPIEDAD
+    public $imagen; 
     private $db;
 
     public function __construct() {
@@ -12,11 +12,11 @@ class Categoria {
     // Getters y Setters
     function getId() { return $this->id; }
     function getNombre() { return $this->nombre; }
-    function getImagen() { return $this->imagen; } // NUEVO GETTER
+    function getImagen() { return $this->imagen; } 
 
     function setId($id) { $this->id = $id; }
     function setNombre($nombre) { $this->nombre = $this->db->real_escape_string($nombre); }
-    function setImagen($imagen) { $this->imagen = $imagen; } // NUEVO SETTER
+    function setImagen($imagen) { $this->imagen = $imagen; } 
 
     // Listar todas las categorías
     public function getAll() {
@@ -31,19 +31,17 @@ class Categoria {
         return $categoria->fetch_object();
     }
 
-    // Guardar categoría (Modificado para incluir imagen)
+    // Guardar categoría 
     public function save(){
-        // Usamos la propiedad imagen en el SQL
         $sql = "INSERT INTO categorias VALUES(NULL, '{$this->nombre}', '{$this->imagen}');";
         $save = $this->db->query($sql);
         return $save ? true : false;
     }
     
-    // Editar categoría (Modificado por si cambias el nombre/imagen)
-    public function edit(){
+    // Editar categoría 
+    public function update(){
         $sql = "UPDATE categorias SET nombre='{$this->nombre}'";
         
-        // Solo actualizamos la imagen si se envió una nueva
         if($this->imagen != null){
             $sql .= ", imagen='{$this->imagen}'";
         }
@@ -53,4 +51,17 @@ class Categoria {
         $save = $this->db->query($sql);
         return $save ? true : false;
     }
+
+    // 🔥 ELIMINAR CON PROTECCIÓN CONTRA ERRORES FATALES 🔥
+    public function delete(){
+        try {
+            $sql = "DELETE FROM categorias WHERE id={$this->id}";
+            $delete = $this->db->query($sql);
+            return $delete ? true : false;
+        } catch (mysqli_sql_exception $e) {
+            // Si salta el error de las llaves foráneas, devolvemos false para mostrar el mensaje
+            return false;
+        }
+    }
 }
+?>

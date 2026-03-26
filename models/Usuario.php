@@ -8,6 +8,8 @@ class Usuario {
     private $password;
     private $rol;
     private $imagen;
+    private $telefono; // 🔥 Nuevo
+    private $google_id; // 🔥 Nuevo
     private $token_reset;
     private $fecha_token;
     private $db;
@@ -24,6 +26,8 @@ class Usuario {
     function getPassword() { return $this->password; }
     function getRol() { return $this->rol; }
     function getImagen() { return $this->imagen; }
+    function getTelefono() { return $this->telefono; }
+    function getGoogleId() { return $this->google_id; }
     function getTokenReset() { return $this->token_reset; }
 
     // --- SETTERS ---
@@ -34,11 +38,10 @@ class Usuario {
     function setPassword($password) { $this->password = $password; }
     function setRol($rol) { $this->rol = $rol; }
     function setImagen($imagen) { $this->imagen = $imagen; }
+    function setTelefono($telefono) { $this->telefono = $telefono; }
+    function setGoogleId($google_id) { $this->google_id = $google_id; }
     function setTokenReset($token_reset) { $this->token_reset = $token_reset; }
 
-    // --- MÉTODOS DE BASE DE DATOS (PROTEGIDOS CON PREPARED STATEMENTS) ---
-
-    // NUEVO MÉTODO PARA VALIDAR EMAIL DUPLICADO
     public function findByEmail($email) {
         $stmt = $this->db->prepare("SELECT * FROM usuarios WHERE email = ?");
         $stmt->bind_param("s", $email);
@@ -52,10 +55,10 @@ class Usuario {
     }
 
     public function save(){
-        // Usamos Prepared Statements para insertar
-        $sql = "INSERT INTO usuarios (nombre, apellidos, email, password, rol) VALUES(?, ?, ?, ?, 'user')";
+        // Insertamos con el campo teléfono incluido
+        $sql = "INSERT INTO usuarios (nombre, apellidos, email, password, telefono, rol) VALUES(?, ?, ?, ?, ?, 'user')";
         $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("ssss", $this->nombre, $this->apellidos, $this->email, $this->password);
+        $stmt->bind_param("sssss", $this->nombre, $this->apellidos, $this->email, $this->password, $this->telefono);
         
         $save = $stmt->execute();
         $stmt->close();
@@ -64,24 +67,17 @@ class Usuario {
 
     public function login($email, $password) {
         $result = false;
-        
-        // 1. Preparamos la consulta
         $stmt = $this->db->prepare("SELECT * FROM usuarios WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
-        
         $login = $stmt->get_result();
         
         if($login && $login->num_rows == 1) {
             $usuario = $login->fetch_object();
-            
             $verify = false;
-            
-            // 2. Verificación Dual (Hash y Texto Plano)
             if(password_verify($password, $usuario->password)) {
                 $verify = true;
-            } 
-            else if($password == $usuario->password) {
+            } else if($password == $usuario->password) {
                 $verify = true;
             }
 
@@ -94,13 +90,12 @@ class Usuario {
     }
 
     public function update(){
-        // Para actualizaciones dinámicas es un poco más complejo, 
-        // pero mantenemos la seguridad limpiando los datos básicos
         $nombre = $this->db->real_escape_string($this->nombre);
         $apellidos = $this->db->real_escape_string($this->apellidos);
         $email = $this->db->real_escape_string($this->email);
+        $telefono = $this->db->real_escape_string($this->telefono);
         
-        $sql = "UPDATE usuarios SET nombre='{$nombre}', apellidos='{$apellidos}', email='{$email}' ";
+        $sql = "UPDATE usuarios SET nombre='{$nombre}', apellidos='{$apellidos}', email='{$email}', telefono='{$telefono}' ";
         
         if($this->password != null){ 
             $pw = $this->db->real_escape_string($this->password);
@@ -131,7 +126,6 @@ class Usuario {
         $stmt->bind_param("s", $this->token_reset);
         $stmt->execute();
         $result = $stmt->get_result();
-        
         $stmt->close();
         if($result && $result->num_rows == 1){ return $result->fetch_object(); }
         return false;
@@ -151,7 +145,6 @@ class Usuario {
         return $this->db->query($sql);
     }
 
-    // NUEVO MÉTODO PARA OBTENER UN SOLO USUARIO (Lo usas en verFavoritosAdmin)
     public function getOne() {
         $sql = "SELECT * FROM usuarios WHERE id = {$this->id}";
         $usuario = $this->db->query($sql);

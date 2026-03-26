@@ -220,4 +220,20 @@ class Producto {
         $sql = "SELECT * FROM productos WHERE stock < 5 AND activo = 1 ORDER BY stock ASC";
         return $this->db->query($sql);
     }
+
+    // 🔥 NUEVA FUNCIÓN PARA BORRAR EL PRODUCTO CON PROTECCIÓN 🔥
+    public function delete(){
+        try {
+            // Se limpian tablas secundarias para que borre limpio si no hay pedidos
+            $this->db->query("DELETE FROM productos_tallas WHERE producto_id={$this->id}");
+            $this->db->query("DELETE FROM imagenes WHERE producto_id={$this->id}");
+            
+            $sql = "DELETE FROM productos WHERE id={$this->id}";
+            $delete = $this->db->query($sql);
+            return $delete ? true : false;
+        } catch (mysqli_sql_exception $e) {
+            // Si el producto está asociado a un pedido (lineas_pedidos), fallará y caerá aquí.
+            return false;
+        }
+    }
 }

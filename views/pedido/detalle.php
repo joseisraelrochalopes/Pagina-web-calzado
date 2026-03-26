@@ -8,9 +8,10 @@
         margin-bottom: 50px;
         margin-top: 25px;
     }
+    /* 🔥 SE MODIFICÓ AL 20% PARA QUE QUEPAN LOS 5 PASOS 🔥 */
     .tracking-step {
         flex-grow: 1;
-        width: 25%;
+        width: 20%; 
         margin-top: -12px;
         text-align: center;
         position: relative;
@@ -49,6 +50,15 @@
         width: 0%;
         transition: width 0.5s;
     }
+    /* Efecto para el botón de detalles */
+    .btn-detalle {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+    }
+    .btn-detalle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3) !important;
+    }
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -76,31 +86,36 @@
 <?php if (isset($pedido)): ?>
     
     <?php if($pedido->estado != 'cancelled'): ?>
-        <div class="card mb-4 border-0">
+        <div class="card mb-4 border-0 shadow-sm">
             <div class="card-body">
                 <div class="tracking-track">
                     <?php 
                         $width = '0%';
-                        if($pedido->estado == 'confirm') $width = '25%';
-                        elseif($pedido->estado == 'preparation') $width = '50%';
-                        elseif($pedido->estado == 'ready') $width = '75%';
-                        elseif($pedido->estado == 'sended') $width = '100%';
+                        if($pedido->estado == 'confirm') $width = '20%';
+                        elseif($pedido->estado == 'preparation') $width = '40%';
+                        elseif($pedido->estado == 'ready') $width = '60%';
+                        elseif($pedido->estado == 'sended') $width = '80%';
+                        elseif($pedido->estado == 'delivered') $width = '100%';
                     ?>
                     <div class="tracking-bar" style="width: <?=$width?>;"></div>
                     
-                    <div class="tracking-step <?=($pedido->estado == 'confirm' || $pedido->estado == 'preparation' || $pedido->estado == 'ready' || $pedido->estado == 'sended') ? 'active' : ''?>">
+                    <div class="tracking-step <?=($pedido->estado == 'confirm' || $pedido->estado == 'preparation' || $pedido->estado == 'ready' || $pedido->estado == 'sended' || $pedido->estado == 'delivered') ? 'active' : ''?>">
                         <span class="icon"><i class="bi bi-check"></i></span>
                         <span class="text">Confirmado</span>
                     </div>
-                    <div class="tracking-step <?=($pedido->estado == 'preparation' || $pedido->estado == 'ready' || $pedido->estado == 'sended') ? 'active' : ''?>">
+                    <div class="tracking-step <?=($pedido->estado == 'preparation' || $pedido->estado == 'ready' || $pedido->estado == 'sended' || $pedido->estado == 'delivered') ? 'active' : ''?>">
                         <span class="icon"><i class="bi bi-box-seam"></i></span>
                         <span class="text">Preparando</span>
                     </div>
-                    <div class="tracking-step <?=($pedido->estado == 'ready' || $pedido->estado == 'sended') ? 'active' : ''?>">
-                        <span class="icon"><i class="bi bi-truck"></i></span>
+                    <div class="tracking-step <?=($pedido->estado == 'ready' || $pedido->estado == 'sended' || $pedido->estado == 'delivered') ? 'active' : ''?>">
+                        <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
                         <span class="text">Listo envío</span>
                     </div>
-                    <div class="tracking-step <?=($pedido->estado == 'sended') ? 'active' : ''?>">
+                    <div class="tracking-step <?=($pedido->estado == 'sended' || $pedido->estado == 'delivered') ? 'active' : ''?>">
+                        <span class="icon"><i class="bi bi-truck"></i></span>
+                        <span class="text">Enviado</span>
+                    </div>
+                    <div class="tracking-step <?=($pedido->estado == 'delivered') ? 'active' : ''?>">
                         <span class="icon"><i class="bi bi-house-door"></i></span>
                         <span class="text">Entregado</span>
                     </div>
@@ -127,6 +142,7 @@
                             <option value="preparation" <?=$pedido->estado == "preparation" ? 'selected' : '';?>>En preparación</option>
                             <option value="ready" <?=$pedido->estado == "ready" ? 'selected' : '';?>>Preparado para enviar</option>
                             <option value="sended" <?=$pedido->estado == "sended" ? 'selected' : '';?>>Enviado</option>
+                            <option value="delivered" <?=$pedido->estado == "delivered" ? 'selected' : '';?>>Entregado / Finalizado</option>
                             <option value="cancelled" <?=$pedido->estado == "cancelled" ? 'selected' : '';?>>Cancelado</option>
                         </select>
                     </div>
@@ -143,6 +159,7 @@
                     elseif($pedido->estado == 'preparation') $estado_texto = "EN PREPARACIÓN en nuestro almacén";
                     elseif($pedido->estado == 'ready') $estado_texto = "LISTO PARA ENVIARSE";
                     elseif($pedido->estado == 'sended') $estado_texto = "ENVIADO y va en camino a tu domicilio";
+                    elseif($pedido->estado == 'delivered') $estado_texto = "ENTREGADO FINALIZADO. ¡Gracias por tu compra!";
                     elseif($pedido->estado == 'cancelled') $estado_texto = "CANCELADO";
 
                     $mensaje_wa = "¡Hola! Te contactamos para informarte que tu pedido #" . $pedido->id . " de zapatos ha sido actualizado y ahora se encuentra: *" . $estado_texto . "*. ¡Cualquier duda estamos a tus órdenes!";
@@ -162,7 +179,17 @@
                     <i class="bi bi-truck"></i> Datos de envío
                 </div>
                 <div class="card-body">
-                    <p><strong>Estado Actual:</strong> <?=strtoupper($pedido->estado)?></p>
+                    <p><strong>Estado Actual:</strong> 
+                        <?php
+                            if($pedido->estado == 'confirm') echo "PENDIENTE";
+                            elseif($pedido->estado == 'preparation') echo "EN PREPARACIÓN";
+                            elseif($pedido->estado == 'ready') echo "LISTO PARA ENVIAR";
+                            elseif($pedido->estado == 'sended') echo "ENVIADO";
+                            elseif($pedido->estado == 'delivered') echo "ENTREGADO";
+                            elseif($pedido->estado == 'cancelled') echo "CANCELADO";
+                            else echo strtoupper($pedido->estado);
+                        ?>
+                    </p>
                     
                     <p><strong>Método de Pago:</strong> <?=strtoupper($pedido->metodo_pago ?? 'No especificado')?></p>
                     

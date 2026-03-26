@@ -241,4 +241,47 @@ class ProductoController {
 
         require_once 'views/producto/reporte.php';
     }
+
+    // 🔥 NUEVA FUNCIÓN: ELIMINAR UN SOLO PRODUCTO 🔥
+    public function eliminar(){
+        Utils::isAdmin();
+        if(isset($_GET['id'])){
+            $id = $_GET['id'];
+            $producto = new Producto();
+            $producto->setId($id);
+            $delete = $producto->delete();
+            
+            if($delete){
+                $_SESSION['producto'] = 'deleted';
+            }else{
+                $_SESSION['producto'] = 'delete_failed';
+            }
+        }
+        header("Location:".base_url."producto/gestion");
+    }
+
+    // 🔥 NUEVA FUNCIÓN: ELIMINAR VARIOS PRODUCTOS (MASIVO) 🔥
+    public function eliminarMasivo(){
+        Utils::isAdmin();
+        if(isset($_POST['ids']) && is_array($_POST['ids'])){
+            $ids = $_POST['ids'];
+            $producto = new Producto();
+            $exito = true;
+            
+            foreach($ids as $id){
+                $producto->setId($id);
+                $delete = $producto->delete();
+                if(!$delete){
+                    $exito = false; 
+                }
+            }
+            
+            if($exito){
+                $_SESSION['producto'] = 'deleted';
+            }else{
+                $_SESSION['producto'] = 'delete_failed';
+            }
+        }
+        header("Location:".base_url."producto/gestion");
+    }
 }

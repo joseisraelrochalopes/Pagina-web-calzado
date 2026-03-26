@@ -12,27 +12,23 @@ class CategoriaController {
     }
 
     public function ver(){
-        // Inicializamos las variables como null para evitar el error de "Undefined variable"
         $categoria = null;
         $productos = null;
 
         if(isset($_GET['id'])){
             $id = $_GET['id'];
             
-            // 1. Conseguir la categoría
             $cat = new Categoria();
             $cat->setId($id);
-            $categoria = $cat->getOne(); // Esto devuelve el objeto de la categoría
+            $categoria = $cat->getOne(); 
             
             if($categoria){
-                // 2. Conseguir los productos de esa categoría
                 $producto = new Producto();
                 $producto->setCategoria_id($id);
-                $productos = $producto->getAllCategory(); // Esto devuelve el resultado de la DB
+                $productos = $producto->getAllCategory(); 
             }
         }
         
-        // Cargamos la vista. Ahora $categoria y $productos existen (aunque sean null)
         require_once 'views/categoria/ver.php';
     }
 
@@ -58,7 +54,47 @@ class CategoriaController {
                     $categoria->setImagen($filename);
                 }
             }
-            $save = $categoria->save();
+
+            if(isset($_GET['id'])){
+                $categoria->setId($_GET['id']);
+                $save = $categoria->update(); 
+            } else {
+                $save = $categoria->save(); 
+            }
+        }
+        header("Location:".base_url."categoria/index");
+    }
+
+    public function editar(){
+        Utils::isAdmin();
+        if(isset($_GET['id'])){
+            $id = $_GET['id'];
+            $edit = true; 
+            
+            $categoria = new Categoria();
+            $categoria->setId($id);
+            $cat = $categoria->getOne(); 
+            
+            require_once 'views/categoria/crear.php'; 
+        }else{
+            header("Location:".base_url."categoria/index");
+        }
+    }
+
+    // 🔥 ACTUALIZADO PARA CREAR EL MENSAJE DE ERROR SI FALLA 🔥
+    public function eliminar(){
+        Utils::isAdmin();
+        if(isset($_GET['id'])){
+            $id = $_GET['id'];
+            $categoria = new Categoria();
+            $categoria->setId($id);
+            $delete = $categoria->delete(); 
+            
+            if($delete){
+                $_SESSION['delete'] = 'complete';
+            }else{
+                $_SESSION['delete'] = 'failed_fk'; // El error de la llave foránea
+            }
         }
         header("Location:".base_url."categoria/index");
     }

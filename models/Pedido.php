@@ -117,6 +117,13 @@ class Pedido {
         return $pedidos;
     }
 
+    // 🔥 NUEVA FUNCIÓN MAGICA: SOLO TRAE LOS PEDIDOS ACTIVOS 🔥
+    public function getActivosAdmin(){
+        // Oculta los que ya están entregados o cancelados
+        $sql = "SELECT * FROM pedidos WHERE estado NOT IN ('delivered', 'cancelled') ORDER BY id DESC";
+        return $this->db->query($sql);
+    }
+
     public function getById($id){
         $id = $this->db->real_escape_string($id);
         $sql = "SELECT * FROM pedidos WHERE id = {$id}";
@@ -165,7 +172,6 @@ class Pedido {
         return $save ? true : false;
     }
 
-    // --- NUEVO: TOP 5 PRODUCTOS MÁS VENDIDOS ---
     public function getBestSellers(){
         $sql = "SELECT p.nombre, p.imagen, SUM(lp.unidades) as total_vendido 
                 FROM lineas_pedidos lp 

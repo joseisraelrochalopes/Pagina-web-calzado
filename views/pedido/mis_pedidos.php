@@ -17,7 +17,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <?php if(isset($gestion)): ?>
-        <h1><i class="bi bi-gear-fill text-dark"></i> Gestionar Pedidos</h1>
+        <h1><i class="bi bi-gear-fill text-dark"></i> Gestionar Pedidos Activos</h1>
         <a href="<?=base_url?>pedido/exportar" class="btn btn-success fw-bold shadow-sm">
             <i class="bi bi-file-earmark-spreadsheet"></i> Exportar a Excel
         </a>
@@ -41,11 +41,14 @@
             <div class="col-md-4">
                 <label class="form-label small text-muted fw-bold">Filtrar por Estado:</label>
                 <select name="filtroEstado" class="form-select shadow-sm" onchange="this.form.submit()">
-                    <option value="">-- Ver Todos --</option>
+                    <option value="">-- Ver Activos --</option>
                     <option value="confirm" <?= (isset($_POST['filtroEstado']) && $_POST['filtroEstado'] == 'confirm') ? 'selected' : '' ?>>Pendientes (Esperando Pago)</option>
                     <option value="preparation" <?= (isset($_POST['filtroEstado']) && $_POST['filtroEstado'] == 'preparation') ? 'selected' : '' ?>>En Preparación</option>
                     <option value="ready" <?= (isset($_POST['filtroEstado']) && $_POST['filtroEstado'] == 'ready') ? 'selected' : '' ?>>Listos para enviar</option>
                     <option value="sended" <?= (isset($_POST['filtroEstado']) && $_POST['filtroEstado'] == 'sended') ? 'selected' : '' ?>>Enviados</option>
+                    
+                    <option value="delivered" <?= (isset($_POST['filtroEstado']) && $_POST['filtroEstado'] == 'delivered') ? 'selected' : '' ?>>Entregados / Finalizados</option>
+                    
                     <option value="cancelled" <?= (isset($_POST['filtroEstado']) && $_POST['filtroEstado'] == 'cancelled') ? 'selected' : '' ?>>Cancelados</option>
                 </select>
             </div>
@@ -63,7 +66,7 @@
     <div class="card-body p-0">
         <?php if($pedidos->num_rows == 0): ?>
             <div class="alert alert-warning text-center m-4 fw-bold p-4 rounded-3">
-                <i class="bi bi-inbox fs-1 d-block mb-2"></i> No se encontraron pedidos.
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i> No hay pedidos en esta sección.
             </div>
         <?php else: ?>
             <div class="table-responsive">
@@ -114,6 +117,10 @@
                                         <span class="badge bg-primary px-3 py-2 rounded-pill shadow-sm">Preparado</span>
                                     <?php elseif($ped->estado == 'sended'): ?>
                                         <span class="badge bg-success px-3 py-2 rounded-pill shadow-sm">Enviado</span>
+                                    
+                                    <?php elseif($ped->estado == 'delivered'): ?>
+                                        <span class="badge bg-dark text-white px-3 py-2 rounded-pill shadow-sm">Entregado</span>
+                                        
                                     <?php elseif($ped->estado == 'cancelled'): ?>
                                         <span class="badge bg-danger px-3 py-2 rounded-pill shadow-sm">Cancelado</span>
                                     <?php else: ?>

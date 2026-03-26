@@ -32,7 +32,6 @@ class PedidoController {
                 $pedido->setCosteEnvio( ($coste >= 200) ? 0 : 10 );
                 $pedido->setMetodoPago($metodo_pago);
                 
-                // Si es PayPal, el estado inicial es 'Pendiente de Pago'
                 if($metodo_pago == 'PayPal'){
                     $pedido->setEstado('confirm'); 
                 }
@@ -134,11 +133,13 @@ class PedidoController {
         } elseif(isset($_POST['filtroEstado']) && $_POST['filtroEstado'] != ''){
             $pedidos = $pedido->getByStatus($_POST['filtroEstado']);
         } else {
-            $pedidos = $pedido->getAll();
+            // 🔥 AQUÍ SE APLICA EL FILTRO INTELIGENTE PARA OCULTAR FINALIZADOS 🔥
+            $pedidos = $pedido->getActivosAdmin();
         }
         require_once 'views/pedido/mis_pedidos.php';
     }
 
+    // 🔥 TE RESTAURÉ TU FUNCIÓN DE ESTADOS Y CORREOS QUE SE TE HABÍA BORRADO 🔥
     public function estado(){
         Utils::isAdmin();
         if(isset($_POST['pedido_id']) && isset($_POST['estado'])){
@@ -147,14 +148,12 @@ class PedidoController {
             
             $pedido = new Pedido();
             $pedido->setId($id);
-            
             $pedido_info = $pedido->getOne(); 
             
             $pedido->setEstado($estado);
             $edit = $pedido->edit();
             
             if($edit && $pedido_info){
-                
                 $db = Database::connect();
                 $usuario_id = $pedido_info->usuario_id;
                 $sql = "SELECT nombre, email FROM usuarios WHERE id = {$usuario_id}";
@@ -164,12 +163,12 @@ class PedidoController {
                     $user_data = $resultado->fetch_object();
                     
                     if(!empty($user_data->email)){
-                        
                         $estado_texto = "en proceso";
                         if($estado == 'confirm') $estado_texto = "CONFIRMADO y en espera de preparación";
                         elseif($estado == 'preparation') $estado_texto = "EN PREPARACIÓN en nuestro almacén";
                         elseif($estado == 'ready') $estado_texto = "LISTO PARA ENVIARSE";
                         elseif($estado == 'sended') $estado_texto = "ENVIADO y va en camino a tu domicilio";
+                        elseif($estado == 'delivered') $estado_texto = "ENTREGADO FINALIZADO. ¡Gracias por tu compra!"; // Nuevo estado
                         elseif($estado == 'cancelled') $estado_texto = "CANCELADO";
 
                         $to = $user_data->email;
@@ -179,9 +178,8 @@ class PedidoController {
                         $message .= "Te informamos que el estado de tu pedido #" . $id . " ha sido actualizado.\n\n";
                         $message .= "Nuevo estado: " . strtoupper($estado_texto) . "\n\n";
                         $message .= "Puedes revisar los detalles entrando a tu cuenta en nuestra tienda.\n\n";
-                        $message .= "Gracias por tu compra.";
+                        $message .= "Gracias por tu preferencia.";
 
-                        // ACTUALIZADO PARA ENVIAR COMO CALSADO.SHOP
                         $headers = "From: notificaciones@calsado.shop" . "\r\n" .
                                    "Reply-To: contacto@calsado.shop" . "\r\n" .
                                    "X-Mailer: PHP/" . phpversion();
@@ -189,11 +187,8 @@ class PedidoController {
                         @mail($to, $subject, $message, $headers); 
                     }
                 }
-                
-                // 🔥 ESTA ES LA LÍNEA NUEVA QUE ACTIVA EL MENSAJE VERDE 🔥
                 $_SESSION['status_pedido'] = "success";
             }
-            
             header("Location:".base_url.'pedido/detalle?id='.$id);
         }else{
             header("Location:".base_url);

@@ -1,54 +1,3 @@
-<style>
-    /* ✨ EFECTOS VISUALES ANIMADOS ✨ */
-    .card-efecto {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border-radius: 15px;
-        overflow: hidden;
-        border: none !important;
-    }
-    .card-efecto:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important;
-    }
-    .img-wrapper { overflow: hidden; }
-    .img-efecto { transition: transform 0.5s ease; }
-    .card-efecto:hover .img-efecto { transform: scale(1.08); }
-    
-    @media (max-width: 768px) {
-        .carousel-img-box { min-height: 250px !important; }
-        .carousel-text-box { padding: 2rem 1.5rem !important; text-align: center; }
-        .carousel-text-box h2 { font-size: 1.8rem; }
-    }
-
-    /* 🔥 PAGINACIÓN LIMPIA Y RESPONSIVA 🔥 */
-    .paginacion-scroll {
-        overflow-x: auto;
-        white-space: nowrap;
-        padding: 15px 5px;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    .paginacion-scroll::-webkit-scrollbar { height: 4px; }
-    .paginacion-scroll::-webkit-scrollbar-thumb { background: #eee; border-radius: 10px; }
-
-    .pagination .page-item { margin: 0 3px; }
-
-    .pagination .page-link {
-        border-radius: 8px !important;
-        border: 1px solid #dee2e6 !important;
-        color: #333;
-        padding: 8px 14px;
-        font-weight: bold;
-        transition: all 0.2s;
-    }
-
-    .pagination .page-item.active .page-link {
-        background-color: #000 !important;
-        border-color: #000 !important;
-        color: #fff !important;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-</style>
 
 <?php 
     // 🔥 MAGIA: OBTENER LOS FAVORITOS DEL USUARIO ACTUAL PARA PINTAR LOS CORAZONES 🔥
@@ -75,7 +24,7 @@
                 while($oferta = $ofertas->fetch_object()): 
             ?>
                 <div class="carousel-item <?= $active ? 'active' : '' ?>" data-bs-interval="4000">
-                    <div class="row g-0 bg-dark text-white align-items-stretch" style="min-height: 400px;">
+                    <div class="row g-0 carousel-ofertas-bg text-white align-items-stretch" style="min-height: 400px;">
                         <div class="col-md-6 p-0 bg-white d-flex align-items-center justify-content-center carousel-img-box">
                             <img src="<?=Utils::showImage($oferta->imagen)?>" class="img-fluid p-4" style="width: 100%; height: 400px; object-fit: contain;" alt="<?=$oferta->nombre?>">
                         </div>

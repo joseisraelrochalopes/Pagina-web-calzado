@@ -24,9 +24,15 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" value="<?=$_SESSION['identity']->email?>" required>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" value="<?=$_SESSION['identity']->email?>" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" name="telefono" class="form-control" value="<?=isset($_SESSION['identity']->telefono) ? $_SESSION['identity']->telefono : ''?>">
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -39,7 +45,11 @@
                         <div class="d-flex align-items-center">
                             <div class="me-3">
                                 <?php if(isset($_SESSION['identity']->imagen) && !empty($_SESSION['identity']->imagen)): ?>
-                                    <img src="<?=base_url?>assets/img/users/<?=$_SESSION['identity']->imagen?>" class="rounded-circle border" width="60" height="60" style="object-fit: cover;">
+                                    <?php if(strpos($_SESSION['identity']->imagen, 'http') === 0): ?>
+                                        <img src="<?=$_SESSION['identity']->imagen?>" class="rounded-circle border" width="60" height="60" style="object-fit: cover;">
+                                    <?php else: ?>
+                                        <img src="<?=base_url?>assets/img/users/<?=$_SESSION['identity']->imagen?>" class="rounded-circle border" width="60" height="60" style="object-fit: cover;">
+                                    <?php endif; ?>
                                 <?php else: ?>
                                     <img src="https://via.placeholder.com/60" class="rounded-circle border">
                                 <?php endif; ?>

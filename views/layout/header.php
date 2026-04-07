@@ -14,95 +14,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="<?=base_url?>assets/css/styles.css">
-
-    <style>
-        /* 🏛️ ESTILO CONFIABLE, FORMAL Y ELEGANTE 🏛️ */
-        
-        .navbar-custom {
-            background-color: #0a192f !important; 
-            border-bottom: 3px solid #b89324; 
-            padding: 10px 0;
-        }
-
-        .navbar-nav .nav-link {
-            position: relative;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #e6f1ff !important;
-            transition: all 0.3s ease;
-        }
-        
-        .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
-            color: #b89324 !important;
-        }
-
-        .dropdown-menu {
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            border-top: 4px solid #b89324;
-        }
-
-        /* 🔍 BUSCADOR RESPONSIVO 🔍 */
-        .search-zapateria {
-            background-color: rgb(255, 255, 255);
-            border: 1px solid #b89324;
-            color: #0a192f !important; /* Corregido color de texto para visibilidad */
-            border-radius: 50px 0 0 50px !important;
-        }
-        .search-zapateria:focus {
-            background-color: white;
-            color: #0a192f !important;
-        }
-        .btn-search-custom {
-            border-radius: 0 50px 50px 0 !important; 
-            background-color: #b89324;
-            border: 1px solid #b89324;
-            color: white;
-        }
-
-        .badge-latido {
-            background-color: #b89324 !important;
-            animation: pulseBadge 2s infinite;
-        }
-
-        /* ✨ AJUSTES QUIRÚRGICOS PARA CELULARES ✨ */
-        @media (max-width: 991px) {
-            .navbar-brand span {
-                font-size: 0.9rem;
-            }
-            .navbar-collapse {
-                background-color: #0a192f;
-                padding: 15px;
-                border-radius: 10px;
-                margin-top: 10px;
-                border: 1px solid rgba(184, 147, 36, 0.3);
-            }
-            .mobile-icons-row {
-                display: flex !important;
-                flex-direction: row !important;
-                justify-content: space-around !important;
-                width: 100%;
-                margin-top: 15px;
-                padding-top: 15px;
-                border-top: 1px solid rgba(255,255,255,0.1);
-            }
-            .nav-item {
-                text-align: center;
-                margin-bottom: 5px;
-            }
-            .search-container {
-                margin: 15px 0 !important;
-            }
-        }
-
-        @keyframes pulseBadge {
-            0% { box-shadow: 0 0 0 0 rgba(184, 147, 36, 0.7); }
-            70% { box-shadow: 0 0 0 8px rgba(184, 147, 36, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(184, 147, 36, 0); }
-        }
-    </style>
 </head>
 <body>
     
@@ -175,7 +86,11 @@
                         <a class="nav-link dropdown-toggle d-flex align-items-center text-white" href="#" role="button" data-bs-toggle="dropdown">
                             <?php if(isset($_SESSION['identity'])): ?>
                                 <?php if(!empty($_SESSION['identity']->imagen)): ?>
-                                    <img src="<?=base_url?>assets/img/users/<?=$_SESSION['identity']->imagen?>" class="rounded-circle shadow-sm me-2" width="30" height="30" style="object-fit: cover; border: 2px solid #b89324;">
+                                    <?php if(strpos($_SESSION['identity']->imagen, 'http') === 0): ?>
+                                        <img src="<?=$_SESSION['identity']->imagen?>" class="rounded-circle shadow-sm me-2" width="30" height="30" style="object-fit: cover; border: 2px solid #b89324;">
+                                    <?php else: ?>
+                                        <img src="<?=base_url?>assets/img/users/<?=$_SESSION['identity']->imagen?>" class="rounded-circle shadow-sm me-2" width="30" height="30" style="object-fit: cover; border: 2px solid #b89324;">
+                                    <?php endif; ?>
                                 <?php else: ?>
                                     <i class="bi bi-person-circle fs-4 text-warning me-2"></i>
                                 <?php endif; ?>

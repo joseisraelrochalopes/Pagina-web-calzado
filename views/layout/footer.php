@@ -51,49 +51,6 @@
     </div>
 </footer>
 
-<style>
-    /* ✨ EFECTOS PARA EL FOOTER ✨ */
-    .footer-link {
-        transition: all 0.3s ease;
-        display: inline-block;
-    }
-    .footer-link:hover {
-        color: #b89324 !important;
-        transform: translateX(5px);
-    }
-    .social-icon {
-        width: 38px;
-        height: 38px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        border-color: rgba(255,255,255,0.2);
-    }
-    .social-icon:hover {
-        background-color: #b89324;
-        border-color: #b89324;
-        transform: translateY(-5px);
-        color: white;
-    }
-    .btn-equipo {
-        text-decoration: none;
-        color: #e6f1ff;
-        background: rgba(255,255,255,0.05);
-        padding: 5px 15px;
-        border-radius: 50px;
-        font-size: 0.8rem;
-        border: 1px solid rgba(184, 147, 36, 0.3);
-        transition: all 0.3s ease;
-        display: inline-block;
-        margin-top: 10px;
-    }
-    .btn-equipo:hover {
-        background: #b89324;
-        color: white;
-        transform: scale(1.05);
-    }
-</style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

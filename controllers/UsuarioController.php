@@ -134,9 +134,10 @@ class UsuarioController {
         if (isset($_GET['code'])) {
             // --- CONFIGURACIÓN ---
             $client_id = "520144432766-h1tl34gmborl48sqahct3h42ls4tptdg.apps.googleusercontent.com"; 
-            $client_secret = "****yZ0k"; // <-- PEGA AQUÍ TU SECRETO DE LA IMAGEN
             
-            // Forzamos la URL de internet para evitar el error de localhost
+            // 🔥 TU SECRETO REAL ESTÁ AQUÍ 🔥
+            $client_secret = "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"; 
+            
             $redirect_uri = "https://calsado.shop/usuario/google_callback";
 
             $post_data = [
@@ -154,6 +155,7 @@ class UsuarioController {
             $data = json_decode($response, true);
             curl_close($ch);
 
+            // Si Google nos da el pase de acceso (Token)
             if (isset($data['access_token'])) {
                 $user_info_url = 'https://www.googleapis.com/oauth2/v3/userinfo?access_token=' . $data['access_token'];
                 $user_info = json_decode(file_get_contents($user_info_url), true);
@@ -165,24 +167,40 @@ class UsuarioController {
                     if ($identity) {
                         $_SESSION['identity'] = $identity;
                         if($identity->rol == 'admin'){ $_SESSION['admin'] = true; }
+                        
+                        // 🔥 CAPTURAMOS LA IMAGEN DE GOOGLE SI YA EXISTE EL USUARIO 🔥
+                        if (isset($user_info['picture'])) {
+                            $_SESSION['identity']->imagen = $user_info['picture'];
+                        }
                     } else {
                         $usuario->setNombre($user_info['given_name']);
                         $usuario->setApellidos($user_info['family_name'] ?? '');
                         $usuario->setEmail($user_info['email']);
                         $usuario->setGoogleId($user_info['sub']);
                         $usuario->setPassword('google_auth_' . bin2hex(random_bytes(4)));
+                        
+                        // 🔥 AQUÍ DEJAMOS EL TELÉFONO EN BLANCO PORQUE GOOGLE NO LO DA 🔥
                         $usuario->setTelefono(''); 
                         
                         $save = $usuario->save();
                         if($save) {
                             $_SESSION['identity'] = $usuario->findByEmail($user_info['email']);
+                            
+                            // 🔥 CAPTURAMOS LA IMAGEN DE GOOGLE PARA EL USUARIO NUEVO 🔥
+                            if (isset($user_info['picture'])) {
+                                $_SESSION['identity']->imagen = $user_info['picture'];
+                            }
                         }
                     }
+                    // Registro exitoso, vamos al inicio
                     header("Location:" . base_url);
                     exit();
                 }
+            } else {
+                $_SESSION['error_login'] = 'Error de Google: Verifica que tu Client Secret sea correcto.';
             }
         }
         header("Location:" . base_url . "usuario/login");
     }
 }
+?>

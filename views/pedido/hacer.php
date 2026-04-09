@@ -29,18 +29,24 @@
                         <h5 class="mb-3 border-bottom pb-2">Dirección de Entrega</h5>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">Provincia / Estado</label>
-                                <input type="text" name="provincia" class="form-control" placeholder="Ej: Lima" required>
+                                <label class="form-label">Estado</label>
+                                <input type="text" name="provincia" class="form-control" placeholder="Ej: Veracruz" value="<?=isset($_SESSION['identity']->provincia) ? $_SESSION['identity']->provincia : ''?>" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Ciudad / Distrito</label>
-                                <input type="text" name="localidad" class="form-control" placeholder="Ej: Miraflores" required>
+                                <label class="form-label">Localida / Municipio</label>
+                                <input type="text" name="localidad" class="form-control" placeholder="Ej: tihuatlan" value="<?=isset($_SESSION['identity']->localidad) ? $_SESSION['identity']->localidad : ''?>" required>
                             </div>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="form-label">Dirección Completa</label>
-                            <input type="text" name="direccion" class="form-control" placeholder="Av. Larco 123, Dpto 401" required>
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <label class="form-label">Dirección Completa</label>
+                                <input type="text" name="direccion" class="form-control" placeholder="Ej: calle venustiano carranza" value="<?=isset($_SESSION['identity']->direccion) ? $_SESSION['identity']->direccion : ''?>" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Teléfono / Celular</label>
+                                <input type="tel" name="telefono" class="form-control" placeholder="Ej: 5512345678" value="<?=isset($_SESSION['identity']->telefono) ? $_SESSION['identity']->telefono : ''?>" required>
+                            </div>
                         </div>
 
                         <h5 class="mb-3 border-bottom pb-2">Método de Pago</h5>

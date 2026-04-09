@@ -96,6 +96,18 @@ class PedidoController {
                 $pedido = $pedido->getOne();
                 $pedido_productos = new Pedido();
                 $productos = $pedido_productos->getProductosByPedido($id);
+                
+                // 🔥 AQUÍ OBTENEMOS EL TELÉFONO DEL CLIENTE PARA MANDARLO A LA VISTA 🔥
+                $db = Database::connect();
+                $usuario_id = $pedido->usuario_id;
+                $sql = "SELECT telefono FROM usuarios WHERE id = {$usuario_id}";
+                $resultado = $db->query($sql);
+                $telefono_cliente = "";
+                if($resultado && $resultado->num_rows == 1){
+                    $user_data = $resultado->fetch_object();
+                    $telefono_cliente = $user_data->telefono;
+                }
+                
                 require_once 'views/pedido/detalle.php';
             }else{
                 header("Location:".base_url."pedido/mis_pedidos");
@@ -139,7 +151,7 @@ class PedidoController {
         require_once 'views/pedido/mis_pedidos.php';
     }
 
-    // 🔥 TE RESTAURÉ TU FUNCIÓN DE ESTADOS Y CORREOS QUE SE TE HABÍA BORRADO 🔥
+    // 🔥 FUNCIÓN DE CORREOS 100% INTACTA COMO ME LA MANDASTE 🔥
     public function estado(){
         Utils::isAdmin();
         if(isset($_POST['pedido_id']) && isset($_POST['estado'])){

@@ -83,6 +83,7 @@
     </div>
     <?php unset($_SESSION['status_pedido']); // Borramos el mensaje para que no salga siempre ?>
 <?php endif; ?>
+
 <?php if (isset($pedido)): ?>
     
     <?php if($pedido->estado != 'cancelled'): ?>
@@ -163,10 +164,20 @@
                     elseif($pedido->estado == 'cancelled') $estado_texto = "CANCELADO";
 
                     $mensaje_wa = "¡Hola! Te contactamos para informarte que tu pedido #" . $pedido->id . " de zapatos ha sido actualizado y ahora se encuentra: *" . $estado_texto . "*. ¡Cualquier duda estamos a tus órdenes!";
+                    
+                    // Limpiamos el teléfono por si tiene espacios o guiones
+                    $telefono_limpio = preg_replace('/[^0-9]/', '', $telefono_cliente);
                 ?>
-                <a href="https://wa.me/?text=<?=urlencode($mensaje_wa)?>" target="_blank" class="btn btn-success w-100 fw-bold shadow-sm" style="background-color: #25D366; border-color: #25D366;">
-                    <i class="bi bi-whatsapp"></i> Notificar este cambio al cliente por WhatsApp
-                </a>
+                
+                <?php if(!empty($telefono_limpio)): ?>
+                    <a href="https://wa.me/<?=$telefono_limpio?>?text=<?=urlencode($mensaje_wa)?>" target="_blank" class="btn btn-success w-100 fw-bold shadow-sm" style="background-color: #25D366; border-color: #25D366;">
+                        <i class="bi bi-whatsapp"></i> Notificar este cambio al cliente por WhatsApp (<?=$telefono_cliente?>)
+                    </a>
+                <?php else: ?>
+                    <button class="btn btn-secondary w-100 fw-bold shadow-sm" disabled>
+                        <i class="bi bi-whatsapp"></i> El cliente no tiene teléfono registrado
+                    </button>
+                <?php endif; ?>
 
             </div>
         </div>
@@ -197,6 +208,7 @@
                     <p><strong>Provincia:</strong> <?= $pedido->provincia ?></p>
                     <p><strong>Ciudad:</strong> <?= $pedido->localidad ?></p>
                     <p><strong>Dirección:</strong> <?= $pedido->direccion ?></p>
+                    <p><strong>Teléfono:</strong> <?= !empty($telefono_cliente) ? $telefono_cliente : '<span class="text-muted">No registrado</span>' ?></p>
                 </div>
             </div>
         </div>

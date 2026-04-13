@@ -1,11 +1,11 @@
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
     <h1>Gestión de Productos</h1>
-    <div>
-        <a href="<?=base_url?>producto/reporte" target="_blank" class="btn btn-outline-dark me-2">
+    <div class="d-flex flex-wrap gap-2">
+        <a href="<?=base_url?>producto/reporte" target="_blank" class="btn btn-outline-dark">
             <i class="bi bi-file-earmark-pdf-fill"></i> Descargar Informe
         </a>
         
-        <button type="submit" form="formEliminarMasivo" class="btn btn-danger me-2" onclick="return confirm('¿Estás seguro de eliminar TODOS los productos seleccionados? Esta acción no se puede deshacer.');">
+        <button type="submit" form="formEliminarMasivo" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar TODOS los productos seleccionados? Esta acción no se puede deshacer.');">
             <i class="bi bi-trash"></i> Eliminar Seleccionados
         </button>
 
@@ -66,76 +66,79 @@
         <?php else: ?>
             
             <form id="formEliminarMasivo" action="<?=base_url?>producto/eliminarMasivo" method="POST">
-                <table class="table table-hover table-bordered align-middle">
-                    <thead class="table-dark text-center">
-                        <tr>
-                            <th style="width: 40px;">
-                                <input class="form-check-input" type="checkbox" id="selectAll" title="Seleccionar todos">
-                            </th>
-                            <th>ID</th>
-                            <th>Imagen</th>
-                            <th>Nombre</th>
-                            <th>Precio Base</th> 
-                            <th>Stock Total</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while($pro = $productos->fetch_object()): ?>
-                            <tr class="<?= ($pro->activo == 0) ? 'table-secondary text-muted' : '' ?>">
-                                
-                                <td class="text-center">
-                                    <input class="form-check-input product-checkbox" type="checkbox" name="ids[]" value="<?=$pro->id?>">
-                                </td>
-
-                                <td class="text-center"><?=$pro->id;?></td>
-                                
-                                <td class="text-center" style="width: 80px;">
-                                    <img src="<?=Utils::showImage($pro->imagen)?>" class="img-fluid rounded border" style="max-height: 50px; object-fit: contain; background: #fff;">
-                                </td>
-                                
-                                <td>
-                                    <span class="fw-bold"><?=$pro->nombre;?></span>
-                                    <?php if($pro->oferta == 'SI'): ?>
-                                        <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">OFERTA</span>
-                                    <?php endif; ?>
-                                </td>
-                                
-                                <td class="text-center fw-bold text-success">
-                                    <?=Utils::formatPrice($pro->precio);?>
-                                </td>
-                                
-                                <td class="text-center <?= ($pro->stock < 5) ? 'text-danger fw-bold' : '' ?>">
-                                    <?=$pro->stock;?>
-                                </td>
-                                
-                                <td class="text-center">
-                                    <?php if($pro->activo == 1): ?>
-                                        <span class="badge bg-success">Activo</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-danger">Inactivo</span>
-                                    <?php endif; ?>
-                                </td>
-                                
-                                <td class="text-center">
-                                    <div class="btn-group shadow-sm">
-                                        <a href="<?=base_url?>producto/editar?id=<?=$pro->id?>" class="btn btn-warning btn-sm" title="Editar">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <a href="<?=base_url?>producto/activarDesactivar?id=<?=$pro->id?>" class="btn btn-<?= ($pro->activo==1)?'secondary':'success' ?> btn-sm" title="Cambiar Estado">
-                                            <i class="bi bi-<?= ($pro->activo==1)?'power':'check-lg' ?>"></i>
-                                        </a>
-                                        <a href="<?=base_url?>producto/eliminar?id=<?=$pro->id?>" class="btn btn-danger btn-sm" title="Eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este producto definitivamente?');">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th style="width: 40px;">
+                                    <input class="form-check-input" type="checkbox" id="selectAll" title="Seleccionar todos">
+                                </th>
+                                <th>ID</th>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Precio Base</th> 
+                                <th>Stock Total</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
                             </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-            </form>
+                        </thead>
+                        <tbody>
+                            <?php while($pro = $productos->fetch_object()): ?>
+                                <tr class="<?= ($pro->activo == 0) ? 'table-secondary text-muted' : '' ?>">
+                                    
+                                    <td class="text-center">
+                                        <input class="form-check-input product-checkbox" type="checkbox" name="ids[]" value="<?=$pro->id?>">
+                                    </td>
+
+                                    <td class="text-center"><?=$pro->id;?></td>
+                                    
+                                    <td class="text-center" style="width: 80px;">
+                                        <img src="<?=Utils::showImage($pro->imagen)?>" class="img-fluid rounded border" style="max-height: 50px; object-fit: contain; background: #fff;">
+                                    </td>
+                                    
+                                    <td>
+                                        <span class="fw-bold"><?=$pro->nombre;?></span>
+                                        <?php if($pro->oferta == 'SI'): ?>
+                                            <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">OFERTA</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    
+                                    <td class="text-center fw-bold text-success">
+                                        <?=Utils::formatPrice($pro->precio);?>
+                                    </td>
+                                    
+                                    <td class="text-center <?= ($pro->stock < 5) ? 'text-danger fw-bold' : '' ?>">
+                                        <?=$pro->stock;?>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <?php if($pro->activo == 1): ?>
+                                            <span class="badge bg-success">Activo</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-danger">Inactivo</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <div class="btn-group shadow-sm">
+                                            <a href="<?=base_url?>producto/editar?id=<?=$pro->id?>" class="btn btn-warning btn-sm" title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="<?=base_url?>producto/activarDesactivar?id=<?=$pro->id?>" class="btn btn-<?= ($pro->activo==1)?'secondary':'success' ?> btn-sm" title="Cambiar Estado">
+                                                <i class="bi bi-<?= ($pro->activo==1)?'power':'check-lg' ?>"></i>
+                                            </a>
+                                            <a href="<?=base_url?>producto/eliminar?id=<?=$pro->id?>" class="btn btn-danger btn-sm" title="Eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este producto definitivamente?');">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+                </form>
         <?php endif; ?>
     </div>
 </div>
